@@ -2,10 +2,12 @@
 #include <WiFiClientSecure.h>
 #include <UniversalTelegramBot.h>
 #include <SimpleDHT.h>
-//Pino onde está o Relê
-#define RELAY_PIN 5
+//Pino onde está o Relê lampada 1
+#define RELE1_PIN 5
+//Pino onde está o Relê lampada 2
+#define RELE2_PIN 4
 //Pino onde está o DHT11
-#define DHT_PIN 2
+#define DHT_PIN 15
 //Intervalo entre as checagens de novas mensagens
 #define INTERVAL 1000
 //Token do seu bot. Troque pela que o BotFather te mostrar
@@ -15,8 +17,10 @@
 #define PASSWORD "novembro"
 
 //Comandos aceitos
-const String LIGHT_ON = "ligar a luz";
-const String LIGHT_OFF = "desligar a luz";
+const String LIGHT_ON_QUARTO = "ligar a luz do quarto";
+const String LIGHT_OFF_QUARTO = "desligar a luz do quarto";
+const String LIGHT_ON_SALA = "ligar a luz da sala";
+const String LIGHT_OFF_SALA = "desligar a luz da sala";
 const String CLIMATE = "clima";
 const String STATS = "status";
 const String START = "/start";
@@ -42,8 +46,10 @@ void setup() {
   //Inicializa o WiFi e se conecta à rede
   setupWiFi();
   //Coloca o pino do relê como saída e enviamos o estado atual
-  pinMode(RELAY_PIN, OUTPUT);
-  digitalWrite(RELAY_PIN, relayStatus);
+  pinMode(RELE1_PIN, OUTPUT);
+  pinMode(RELE2_PIN, OUTPUT);
+  digitalWrite(RELE1_PIN, relayStatus);
+  digitalWrite(RELE2_PIN, relayStatus);
 }
 
 void setupWiFi(){
@@ -89,10 +95,14 @@ void handleNewMessages(int numNewMessages){
     String text = bot.messages[i].text; //texto que chegou
     if (text.equalsIgnoreCase(START)){
       handleStart(chatId, bot.messages[i].from_name); //mostra as opções
-    }else if (text.equalsIgnoreCase(LIGHT_ON)){
-      handleLightOn(chatId); //liga o relê
-    }else if (text.equalsIgnoreCase(LIGHT_OFF)){
-     handleLightOff(chatId); //desliga o relê
+    }else if (text.equalsIgnoreCase(LIGHT_ON_QUARTO)){
+      handleLightOnQuarto(chatId); //liga o relê do quarto
+    }else if (text.equalsIgnoreCase(LIGHT_OFF_QUARTO)){
+     handleLightOffQuarto(chatId); //desliga o relê do quarto
+    }else if (text.equalsIgnoreCase(LIGHT_ON_SALA)){
+      handleLightOnSala(chatId); //liga o relê da sala
+    }else if (text.equalsIgnoreCase(LIGHT_OFF_SALA)){
+     handleLightOffSala(chatId); //desliga o relê da sala
     }else if (text.equalsIgnoreCase(CLIMATE)){
       handleClimate(chatId); //envia mensagem com a temperatura e umidade
     }else if (text.equalsIgnoreCase(STATS)){
@@ -124,23 +134,37 @@ void handleStart(String chatId, String fromName){
 String getCommands(){
   //String com a lista de mensagens que são válidas e explicação sobre o que faz
   String message = "Os comandos disponíveis são:\n\n";
-  message += "<b>" + LIGHT_ON + "</b>: Para ligar a luz\n";
-  message += "<b>" + LIGHT_OFF + "</b>: Para desligar a luz\n";
+  message += "<b>" + LIGHT_ON_QUARTO + "</b>: Para ligar a luz do quarto\n";
+  message += "<b>" + LIGHT_OFF_QUARTO + "</b>: Para desligar a luz do quarto\n";
+  message += "<b>" + LIGHT_ON_SALA + "</b>: Para ligar a luz da sala\n";
+  message += "<b>" + LIGHT_OFF_SALA + "</b>: Para desligar a luz da sala\n";
   message += "<b>" + CLIMATE + "</b>: Para verificar o clima\n";
   message += "<b>" + STATS + "</b>: Para verificar o estado da luz e a temperatura";
   return message;
 }
-void handleLightOn(String chatId){
-  //Liga o relê e envia mensagem confirmando a operação
+void handleLightOnQuarto(String chatId){
+  //Liga o relê do quarto e envia mensagem confirmando a operação
   relayStatus = LOW; //A lógica do nosso relê é invertida
-  digitalWrite(RELAY_PIN, relayStatus);  
-  bot.sendMessage(chatId, "A luz está <b>acesa</b>", "HTML");
+  digitalWrite(RELE1_PIN, relayStatus);  
+  bot.sendMessage(chatId, "A luz está do quarto está <b>acesa</b>", "HTML");
 }
-void handleLightOff(String chatId){
-  //Desliga o relê e envia mensagem confirmando a operação 
+void handleLightOffQuarto(String chatId){
+  //Desliga o relê do quarto e envia mensagem confirmando a operação 
   relayStatus = HIGH; //A lógica do nosso relê é invertida
-  digitalWrite(RELAY_PIN, relayStatus);  
-  bot.sendMessage(chatId, "A luz está <b>apagada</b>", "HTML");
+  digitalWrite(RELE1_PIN, relayStatus);  
+  bot.sendMessage(chatId, "A luz do quarto está <b>apagada</b>", "HTML");
+}
+void handleLightOnSala(String chatId){
+  //Liga o relê da sala e envia mensagem confirmando a operação
+  relayStatus = LOW; //A lógica do nosso relê é invertida
+  digitalWrite(RELE2_PIN, relayStatus);  
+  bot.sendMessage(chatId, "A luz da Sala está <b>acesa</b>", "HTML");
+}
+void handleLightOffSala(String chatId){
+  //Desliga o relê da sala e envia mensagem confirmando a operação 
+  relayStatus = HIGH; //A lógica do nosso relê é invertida
+  digitalWrite(RELE2_PIN, relayStatus);  
+  bot.sendMessage(chatId, "A luz da Sala está <b>apagada</b>", "HTML");
 }
 void handleClimate(String chatId){
   //Envia mensagem com o valor da temperatura e da umidade
@@ -165,12 +189,17 @@ String getClimateMessage(){
 void handleStatus(String chatId){
   String message = ""; 
   //Verifica se o relê está ligado ou desligado e gera a mensagem de acordo
-  if(relayStatus == LOW){ //A lógica do nosso relê é invertida
-    message += "A luz está acesa\n";
+  if(RELE1_PIN, relayStatus == LOW){ //A lógica do nosso relê é invertida
+    message += "A luz do quarto está acesa\n";
   }else{
-    message += "A luz está apagada\n";
+    message += "A luz do quarto está apagada\n";
   }
- 
+  if(RELE2_PIN, relayStatus == LOW){ //A lógica do nosso relê é invertida
+    message += "A luz da sala está acesa\n";
+  }else{
+    message += "A luz da sala está apagada\n";
+  }
+  
   //Adiciona à mensagem o valor da temperatura e umidade
   message += getClimateMessage();
  
