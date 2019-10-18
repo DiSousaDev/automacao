@@ -17,8 +17,8 @@
 //Token do seu bot. Troque pela que o BotFather te mostrar
 #define BOT_TOKEN "842075575:AAHlDdCNxseTF2M9lHoHQ3YDv01KB9KEIVo"
 //Troque pelo ssid e senha da sua rede WiFi
-#define SSID "Maktub"
-#define PASSWORD "novembro"
+#define SSID "IFPR-Alunos"
+#define PASSWORD "#alunoifpr"
 
 //Comandos aceitos
 const String LIGHT_ON_QUARTO = "ligar a luz do quarto";
@@ -112,11 +112,11 @@ void handleNewMessages(int numNewMessages){
       handleLightOnSala(chatId); //liga o relê da sala
     }else if (text.equalsIgnoreCase(LIGHT_OFF_SALA)){
      handleLightOffSala(chatId); //desliga o relê da sala
-    }else if (text.equalsIgnoreCase(ALARME_ON)){
+    }/*else if (text.equalsIgnoreCase(ALARME_ON)){
      handleAlarmeON(chatId); //ativa o alarme
     }else if (text.equalsIgnoreCase(ALARME_OFF)){
      handleAlarmeOFF(chatId); //desliga o alarme
-    }else if (text.equalsIgnoreCase(CLIMATE)){
+    }*/else if (text.equalsIgnoreCase(CLIMATE)){
       handleClimate(chatId); //envia mensagem com a temperatura e umidade
     }else if (text.equalsIgnoreCase(STATS)){
       handleStatus(chatId); //envia mensagem com o estado do relê, temperatura e umidade
@@ -151,16 +151,16 @@ String getCommands(){
   message += "<b>" + LIGHT_OFF_QUARTO + "</b>: Para desligar a luz do quarto\n";
   message += "<b>" + LIGHT_ON_SALA + "</b>: Para ligar a luz da sala\n";
   message += "<b>" + LIGHT_OFF_SALA + "</b>: Para desligar a luz da sala\n";
-  message += "<b>" + ALARM_ON + "</b>: Para ativar o alarme.\n";
-  message += "<b>" + ALARM_OFF + "</b>: Para desligar o alarme";
+//message += "<b>" + ALARM_ON + "</b>: Para ativar o alarme.\n";
+//message += "<b>" + ALARM_OFF + "</b>: Para desligar o alarme";
   message += "<b>" + CLIMATE + "</b>: Para verificar o clima\n";
   message += "<b>" + STATS + "</b>: Para verificar o estado da luz e a temperatura";
   return message;
 }
-void handleAlarmeON(String chatId){
+/*void handleAlarmeON(String chatId){
   //ATIVA O ALARME  
   int presencaStatus = digitalRead(PIN_SENSOR);
-  bot.sendMessage(chatId, "O monitoramenta está <b>ativo</b>", "HTML");
+  bot.sendMessage(chatId, "O monitoramento está <b>ativo</b>", "HTML");
   if(presencaStatus == HIGH){
     digitalWrite(PIN_BUZZER, HIGH);
   }else{
@@ -170,7 +170,7 @@ void handleAlarmeON(String chatId){
 
 void handleAlarmeOFF(String chatId){
    //DESATIVA O ALARME 
-}
+}*/
 
 void handleLightOnQuarto(String chatId){
   //Liga o relê do quarto e envia mensagem confirmando a operação
