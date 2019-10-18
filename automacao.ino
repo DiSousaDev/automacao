@@ -5,14 +5,14 @@
 //Pino onde está o Relê
 #define RELAY_PIN 5
 //Pino onde está o DHT11
-#define DHT_PIN 4
+#define DHT_PIN 2
 //Intervalo entre as checagens de novas mensagens
 #define INTERVAL 1000
 //Token do seu bot. Troque pela que o BotFather te mostrar
 #define BOT_TOKEN "842075575:AAHlDdCNxseTF2M9lHoHQ3YDv01KB9KEIVo"
 //Troque pelo ssid e senha da sua rede WiFi
-#define SSID "AgneMoveis"
-#define PASSWORD "Agne36219846"
+#define SSID "Maktub"
+#define PASSWORD "novembro"
 
 //Comandos aceitos
 const String LIGHT_ON = "ligar a luz";
