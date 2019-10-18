@@ -8,6 +8,10 @@
 #define RELE2_PIN 4
 //Pino onde está o DHT11
 #define DHT_PIN 15
+//Pino do Sensor de Presença
+#define PIN_SENSOR 18
+//Pino do Buzzer
+#define PIN_BUZZER 19
 //Intervalo entre as checagens de novas mensagens
 #define INTERVAL 1000
 //Token do seu bot. Troque pela que o BotFather te mostrar
@@ -21,6 +25,8 @@ const String LIGHT_ON_QUARTO = "ligar a luz do quarto";
 const String LIGHT_OFF_QUARTO = "desligar a luz do quarto";
 const String LIGHT_ON_SALA = "ligar a luz da sala";
 const String LIGHT_OFF_SALA = "desligar a luz da sala";
+const String ALARME_ON = "ativar alarme";
+const String ALARME_OFF = "destivar alarme";
 const String CLIMATE = "clima";
 const String STATS = "status";
 const String START = "/start";
@@ -29,6 +35,7 @@ const String START = "/start";
 SimpleDHT11 dht;
 //Estado do relê
 int relayStatus = HIGH;
+//Estado do Sensor de Presença
 //Cliente para conexões seguras
 WiFiClientSecure client;
 //Objeto com os métodos para comunicarmos pelo Telegram
@@ -48,6 +55,8 @@ void setup() {
   //Coloca o pino do relê como saída e enviamos o estado atual
   pinMode(RELE1_PIN, OUTPUT);
   pinMode(RELE2_PIN, OUTPUT);
+  pinMode(PIN_SENSOR, INPUT);
+  pinMode(PIN_BUZZER,OUTPUT);
   digitalWrite(RELE1_PIN, relayStatus);
   digitalWrite(RELE2_PIN, relayStatus);
 }
@@ -103,6 +112,10 @@ void handleNewMessages(int numNewMessages){
       handleLightOnSala(chatId); //liga o relê da sala
     }else if (text.equalsIgnoreCase(LIGHT_OFF_SALA)){
      handleLightOffSala(chatId); //desliga o relê da sala
+    }else if (text.equalsIgnoreCase(ALARME_ON)){
+     handleAlarmeON(chatId); //ativa o alarme
+    }else if (text.equalsIgnoreCase(ALARME_OFF)){
+     handleAlarmeOFF(chatId); //desliga o alarme
     }else if (text.equalsIgnoreCase(CLIMATE)){
       handleClimate(chatId); //envia mensagem com a temperatura e umidade
     }else if (text.equalsIgnoreCase(STATS)){
@@ -138,10 +151,27 @@ String getCommands(){
   message += "<b>" + LIGHT_OFF_QUARTO + "</b>: Para desligar a luz do quarto\n";
   message += "<b>" + LIGHT_ON_SALA + "</b>: Para ligar a luz da sala\n";
   message += "<b>" + LIGHT_OFF_SALA + "</b>: Para desligar a luz da sala\n";
+  message += "<b>" + ALARM_ON + "</b>: Para ativar o alarme.\n";
+  message += "<b>" + ALARM_OFF + "</b>: Para desligar o alarme";
   message += "<b>" + CLIMATE + "</b>: Para verificar o clima\n";
   message += "<b>" + STATS + "</b>: Para verificar o estado da luz e a temperatura";
   return message;
 }
+void handleAlarmeON(String chatId){
+  //ATIVA O ALARME  
+  int presencaStatus = digitalRead(PIN_SENSOR);
+  bot.sendMessage(chatId, "O monitoramenta está <b>ativo</b>", "HTML");
+  if(presencaStatus == HIGH){
+    digitalWrite(PIN_BUZZER, HIGH);
+  }else{
+    digitalWrite(PIN_BUZZER, LOW);
+  }
+}
+
+void handleAlarmeOFF(String chatId){
+   //DESATIVA O ALARME 
+}
+
 void handleLightOnQuarto(String chatId){
   //Liga o relê do quarto e envia mensagem confirmando a operação
   relayStatus = LOW; //A lógica do nosso relê é invertida
