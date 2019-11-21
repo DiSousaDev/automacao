@@ -12,7 +12,7 @@
 //Pino onde está o DHT11
 #define DHT_PIN 15
 //Pino do Sensor de Presença
-#define PIN_SENSOR 27
+#define PIN_SENSOR 22
 //Pino do Buzzer
 #define PIN_BUZZER 19
 //Definindo os nucleos
@@ -31,6 +31,8 @@
 #define PASSWORD "$Th3534leventos$"
 //#define SSID "Maktub"
 //#define PASSWORD "novembro"
+//#define SSID "labipfr"
+//#define PASSWORD "lab1ifpr"
 
 //Comandos aceitos
 const String LIGHT_ON_QUARTO = "ligar a luz do quarto";
