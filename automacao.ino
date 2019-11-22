@@ -35,12 +35,13 @@
 //#define PASSWORD "lab1ifpr"
 
 //Comandos aceitos
-const String LIGHT_ON_QUARTO = "ligar a luz do quarto";
-const String LIGHT_OFF_QUARTO = "desligar a luz do quarto";
-const String LIGHT_ON_SALA = "ligar a luz da sala";
-const String LIGHT_OFF_SALA = "desligar a luz da sala";
-const String ALARME_ON = "ativar alarme";
-const String ALARME_OFF = "desativar alarme";
+const String LIGHT_OFF = "off all";
+const String LIGHT_ON_QUARTO = "on quarto";
+const String LIGHT_OFF_QUARTO = "off quarto";
+const String LIGHT_ON_SALA = "on sala";
+const String LIGHT_OFF_SALA = "off sala";
+const String ALARME_ON = "on alarme";
+const String ALARME_OFF = "off alarme";
 const String CLIMATE = "clima";
 const String STATS = "status";
 const String START = "/start";
@@ -65,7 +66,7 @@ uint32_t lastCheckTime = 0;
 String validSenderIds[SENDER_ID_COUNT] = {"575489178", "1010276640"};
 //sensor de presença desativado
 int presencaStatus = HIGH;
-
+byte flag =0;
 TaskHandle_t handle_setupWiFi;
 QueueHandle_t fila;
 int tamanhodafila      =  5;
@@ -134,6 +135,7 @@ void setupWiFi(void *pvParameters) {
   //Se chegou aqui está conectado
   Serial.println();
   Serial.println("Conexao bem sucedida!");
+  flag = 1; 
   vTaskDelete (handle_setupWiFi);
 }
 //==============================TAREFA 2=======================================
@@ -141,7 +143,13 @@ void verifica(void *pvParameters) {
   for (;;) {
     //Tempo agora desde o boot
     uint32_t now = millis();
-
+    if (WiFi.status() != WL_CONNECTED && flag == 1)
+    {
+      Serial.println("Conexão perdida, reconectando...");
+      WiFi.reconnect();
+      delay(1000);
+      Serial.println(".");
+    }
     //Se o tempo passado desde a última checagem for maior que o intervalo determinado
     if (now - lastCheckTime > INTERVAL)
     {
@@ -216,6 +224,8 @@ void handleNewMessages(int numNewMessages)
 
     if (text.equalsIgnoreCase(START)) {
       handleStart(chatId, bot.messages[i].from_name); //mostra as opções
+    } else if (text.equalsIgnoreCase(LIGHT_OFF)) {
+      handleLightOFF(chatId); //Desliga as luzes
     } else if (text.equalsIgnoreCase(LIGHT_ON_QUARTO)) {
       handleLightOnQuarto(chatId); //liga o relê do quarto
     } else if (text.equalsIgnoreCase(LIGHT_OFF_QUARTO)) {
@@ -282,6 +292,16 @@ void handleAlarmeOn(String chatId) {
 void handleAlarmeOff(String chatId) {
   bot.sendMessage(chatId, "O Monitoramento está <b>desligado</b>", "HTML");
   ATIVA_ALARME = LOW;
+  digitalWrite(led, LOW);
+}
+void handleLightOFF(String chatId){
+  //Desliga TOdas as Luzes
+  relayStatus = HIGH; //A lógica do nosso relê é invertida
+  stQuarto = LOW; //satatus da lampada
+  stQuarto = LOW; //satatus da lampada
+  digitalWrite(RELAY_PIN1, relayStatus);
+  digitalWrite(RELAY_PIN2, relayStatus);
+  bot.sendMessage(chatId, "As luzes estão <b>desligadas.</b>", "HTML");
 }
 
 void handleLightOnQuarto(String chatId) {
