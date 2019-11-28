@@ -10,7 +10,7 @@
 //Pino onde está o Relê lampada 2
 #define RELAY_PIN2 4
 //Pino onde está o DHT11
-#define DHT_PIN 15
+#define DHT_PIN 21
 //Pino do Sensor de Presença
 #define PIN_SENSOR 22
 //Pino do Buzzer
